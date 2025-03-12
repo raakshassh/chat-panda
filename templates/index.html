@@ -23,6 +23,7 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
         
         .container {
@@ -41,6 +42,7 @@
             background: #1e1e1e;
             border-radius: 16px;
             margin-bottom: 20px;
+            max-height: 70vh;
         }
         
         .message-wrapper {
@@ -97,6 +99,7 @@
             resize: none;
             height: 54px;
             max-height: 150px;
+            min-height: 54px;
         }
         
         #send-button {
@@ -134,6 +137,32 @@
         .logo-container h1 {
             font-size: 1.8rem;
         }
+
+        /* Mobile responsiveness */
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+            }
+
+            #user-input {
+                font-size: 0.9rem;
+                padding: 12px;
+            }
+
+            #send-button {
+                height: 32px;
+                width: 32px;
+                right: 10px;
+            }
+
+            .chat-container {
+                padding: 15px;
+            }
+
+            .logo-container h1 {
+                font-size: 1.5rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -158,22 +187,22 @@
         const userInput = document.getElementById("user-input");
         const sendButton = document.getElementById("send-button");
         const chatContainer = document.getElementById("chat-container");
-        
+
         function appendMessage(content, isBot, isThinking = false) {
             const wrapper = document.createElement("div");
             wrapper.classList.add("message-wrapper", isBot ? "bot-wrapper" : "user-wrapper");
-            
+
             const messageElement = document.createElement("div");
             messageElement.classList.add(isBot ? "bot-message" : "user-message");
             if (isThinking) messageElement.classList.add("bot-thinking");
             messageElement.textContent = content;
-            
+
             wrapper.appendChild(messageElement);
             chatContainer.appendChild(wrapper);
             chatContainer.scrollTop = chatContainer.scrollHeight;
             return messageElement;
         }
-        
+
         function sendMessage() {
             const message = userInput.value.trim();
             if (message) {
@@ -181,9 +210,9 @@
                 userInput.value = "";
                 userInput.style.height = "54px";
                 sendButton.disabled = true;
-                
+
                 const thinkingMessage = appendMessage("Chat Panda is thinking...", true, true);
-                
+
                 setTimeout(() => {
                     fetch("/chat", {
                         method: "POST",
@@ -202,7 +231,12 @@
                 }, 500);
             }
         }
-        
+
+        // Enable the send button when the user types something
+        userInput.addEventListener("input", function() {
+            sendButton.disabled = !userInput.value.trim();
+        });
+
         sendButton.addEventListener("click", sendMessage);
         userInput.addEventListener("keypress", function(event) {
             if (event.key === "Enter" && !event.shiftKey) {
@@ -210,7 +244,7 @@
                 sendMessage();
             }
         });
-        
+
         window.addEventListener("load", () => userInput.focus());
     </script>
 </body>
