@@ -4,7 +4,8 @@ import json
 import os
 import re
 
-app = Flask(__name__, template_folder=r"C:\\Users\\ashut\\OneDrive\\Desktop\\project job\\chatbot\\templates")
+template_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
+app = Flask(__name__, template_folder=template_folder)
 
 API_KEY = "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"
 MODEL = "mistralai/mistral-small-24b-instruct-2501:free"
