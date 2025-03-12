@@ -8,30 +8,52 @@ template_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'temp
 app = Flask(__name__, template_folder=template_folder)
 
 API_KEY = "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"
-MODEL = "mistralai/mistral-small-24b-instruct-2501:free"
+MODEL = "qwen/qwen-2.5-coder-32b-instruct:free"
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-def query_openrouter(prompt):
+def query_openrouter(prompt, personality="cute_panda"):
     headers = {
         "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json"
     }
     
+    # Hardcoded name and backstory for specific identity-related queries
+    if "what is your name" in prompt.lower() or "who are you" in prompt.lower():
+        return "Hello! 🐼 My name is Puchu, and I was created with care by Rakshash! 💖"
+    
+    if "who made you" in prompt.lower():
+        return "Rakshash made me! 🐼💖"
+    
+    if "who coded you" in prompt.lower():
+        return "Rakshash coded me! 🐼💻💖"
+
+    # Inject personality into the prompt for other responses
+    if personality == "cute_panda":
+        prompt = f"Respond in a friendly, cute, and playful panda style. Keep it sweet but simple, with a warm tone and emojis. {prompt}"
+    elif personality == "formal":
+        prompt = f"Respond politely and formally. {prompt}"
+    elif personality == "witty":
+        prompt = f"Respond in a witty and humorous manner. {prompt}"
+    else:
+        prompt = f"Respond neutrally. {prompt}"
+
+    # Payload to send to OpenRouter API
     payload = {
         "model": MODEL,
         "messages": [{"role": "user", "content": prompt}]
     }
     
     response = requests.post(API_URL, headers=headers, data=json.dumps(payload))
+    
     if response.status_code == 200:
         raw_text = response.json()["choices"][0]["message"]["content"]
         
-        # Correctly remove \boxed{{...}} using regex
+        # Clean up the response if needed (e.g., remove special formatting)
         clean_text = re.sub(r'\\boxed\{(.*?)\}', r'\1', raw_text, flags=re.DOTALL)
         
         return clean_text.strip()
     else:
-        return "Error: Unable to fetch response from OpenRouter."
+        return "Oops! Something went wrong... 😟"
 
 @app.route("/")
 def home():
