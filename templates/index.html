@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Panda</title>
+    <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #121212;
+            color: #e0e0e0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            width: 95%;
+            max-width: 900px;
+            margin: 20px auto;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #1e1e1e;
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .message-wrapper {
+            display: flex;
+            margin-bottom: 16px;
+        }
+        
+        .user-wrapper {
+            justify-content: flex-end;
+        }
+        
+        .bot-wrapper {
+            justify-content: flex-start;
+        }
+        
+        .user-message, .bot-message {
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        
+        .user-message {
+            background-color: #2D7CFF;
+            color: white;
+        }
+        
+        .bot-message {
+            background-color: #333;
+            color: white;
+        }
+        
+        .bot-thinking {
+            background-color: #444;
+            color: white;
+            font-style: italic;
+            opacity: 0.7;
+        }
+        
+        .input-container {
+            display: flex;
+            position: relative;
+            margin-bottom: 10px;
+        }
+        
+        #user-input {
+            flex-grow: 1;
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px solid #444;
+            background: #1a1a1a;
+            color: white;
+            font-size: 1rem;
+            resize: none;
+            height: 54px;
+            max-height: 150px;
+        }
+        
+        #send-button {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            border-radius: 50%;
+            background-color: #2D7CFF;
+            color: white;
+            cursor: pointer;
+            height: 36px;
+            width: 36px;
+        }
+        
+        #send-button:disabled {
+            background-color: #444;
+            cursor: not-allowed;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo-container img {
+            max-width: 100px;
+            height: auto;
+            margin-right: 10px;
+        }
+        
+        .logo-container h1 {
+            font-size: 1.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <img src="static/images/freepik__upload__42369-removebg-preview.png" alt="Chat Panda Logo">
+                <h1>Chat Panda</h1>
+            </div>
+        </header>
+        <div class="chat-container" id="chat-container">
+            <div class="message-wrapper bot-wrapper">
+                <div class="bot-message">Hello! I'm am Chat Panda your cute Ai assistant!!!</div>
+            </div>
+        </div>
+        <div class="input-container">
+            <textarea id="user-input" placeholder="Type a message..." rows="1"></textarea>
+            <button id="send-button" disabled>&#9658;</button>
+        </div>
+    </div>
+    <script>
+        const userInput = document.getElementById("user-input");
+        const sendButton = document.getElementById("send-button");
+        const chatContainer = document.getElementById("chat-container");
+        
+        function appendMessage(content, isBot, isThinking = false) {
+            const wrapper = document.createElement("div");
+            wrapper.classList.add("message-wrapper", isBot ? "bot-wrapper" : "user-wrapper");
+            
+            const messageElement = document.createElement("div");
+            messageElement.classList.add(isBot ? "bot-message" : "user-message");
+            if (isThinking) messageElement.classList.add("bot-thinking");
+            messageElement.textContent = content;
+            
+            wrapper.appendChild(messageElement);
+            chatContainer.appendChild(wrapper);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return messageElement;
+        }
+        
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (message) {
+                appendMessage(message, false);
+                userInput.value = "";
+                userInput.style.height = "54px";
+                sendButton.disabled = true;
+                
+                const thinkingMessage = appendMessage("Chat Panda is thinking...", true, true);
+                
+                setTimeout(() => {
+                    fetch("/chat", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ message })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        thinkingMessage.remove();
+                        appendMessage(data.response, true);
+                    })
+                    .catch(() => {
+                        thinkingMessage.remove();
+                        appendMessage("Sorry, there was an issue connecting. Try again later.", true);
+                    });
+                }, 500);
+            }
+        }
+        
+        sendButton.addEventListener("click", sendMessage);
+        userInput.addEventListener("keypress", function(event) {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        window.addEventListener("load", () => userInput.focus());
+    </script>
+</body>
+</html>
