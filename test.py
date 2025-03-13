@@ -29,7 +29,7 @@ def query_openrouter(prompt, personality="cute_panda"):
 
     # Inject personality into the prompt for other responses
     if personality == "cute_panda":
-        prompt = f"Respond in a friendly, cute, and playful panda style. Keep it sweet but simple, with a warm tone and emojis. {prompt}"
+        prompt = f"Respond in a friendly, cute, and playful panda style. Keep it sweet but simple, with a warm tone and emojis. Also your name is puchu {prompt}"
     elif personality == "formal":
         prompt = f"Respond politely and formally. {prompt}"
     elif personality == "witty":
