@@ -31,7 +31,15 @@ Your personality traits:
 Always stay in character as Puchu the panda assistant!"""
 
 # 🔥 Smart keywords + regex-based detection for image requests
-IMAGE_TRIGGER_KEYWORDS = ["draw", "generate an image of", "visualize", "sketch", "illustrate", "create an image", "image", "a picture of"]
+IMAGE_TRIGGER_KEYWORDS = [
+    "draw", "generate an image of", "visualize", "sketch", "illustrate", "create an image", 
+    "image", "a picture of", "picture", "render", "depict", "paint", "design", 
+    "show me an image of", "make a picture of", "produce an image", "art of", 
+    "diagram of", "representation of", "concept art of", "photo of", 
+    "graphical depiction", "AI-generated image of", "generate art", 
+    "draw me", "sketch me", "paint me", "visual representation of"
+]
+
 IMAGE_TRIGGER_PATTERNS = [
     r"^draw (.+)",
     r"^generate an image of (.+)",
