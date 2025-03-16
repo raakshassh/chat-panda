@@ -10,8 +10,8 @@ template_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'temp
 app = Flask(__name__, template_folder=template_folder)
 
 # 🔑 API Key for OpenRouter (Text) & Cloudflare (Image)
-TEXT_API_KEY = "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"  # Replace with your actual OpenRouter API key
-IMAGE_API_KEY = "ty9P6Ew1XKo_YC36F_OjCZvxn0Bve4501SjSGA5J"  # Replace with your Cloudflare API key
+TEXT_API_KEY = ""  # Replace with your actual OpenRouter API key
+IMAGE_API_KEY = ""  # Replace with your Cloudflare API key
 
 # API URL for OpenRouter (text generation)
 TEXT_API_URL = "https://openrouter.ai/api/v1/chat/completions"
